@@ -18,5 +18,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @NotNull
-public @interface BeforeToday {
+public @interface AdultBirthday {
+    String message() default "Must be a date in the past";
+
+    Class<?>[] groups() default {};
+
+    Class<?>[] payload() default {};
 }

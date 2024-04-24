@@ -6,7 +6,7 @@ import lombok.NonNull;
 
 import java.time.LocalDate;
 
-public class BeforeTodayValidator implements ConstraintValidator<BeforeToday, LocalDate> {
+public class BeforeTodayValidator implements ConstraintValidator<AdultBirthday, LocalDate> {
 
     @Override
     public boolean isValid(@NonNull LocalDate value, ConstraintValidatorContext context) {
