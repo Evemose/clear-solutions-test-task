@@ -10,12 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.users.core.model.entities.Address;
 import org.users.core.model.entities.User;
 import org.users.core.utils.ConstraintViolationInfo;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.users.core.utils.Assertions.assertConstraintViolations;
 
@@ -96,6 +98,32 @@ public class UserServiceTest {
     @DirtiesContext // could possibly dirty the context if test fails and valid user is deleted
     public void testDeleteById_NotExists() {
         assertThrows(EntityNotFoundException.class, () -> userService.deleteById(Long.MAX_VALUE));
+    }
+
+    @Test
+    @SuppressWarnings("all") // suppress isEqualTo warning about comparing different optional to user
+    public void testFindById_Exists() {
+        var actual = new User("joseph26@example.net", "Adam", "Brady", LocalDate.of(1934, 9, 1));
+        actual.setAddress(new Address("Anthony Burgs", "New Brianshire", "Iraq", 97225L));
+        actual.setId(1L);
+        actual.setPhoneNumber("282-500-3002x343");
+        assertThat(userService.findById(1L))
+                .get()
+                .usingRecursiveComparison()
+                .ignoringFields("createdAt", "updatedAt")
+                .isEqualTo(actual);
+    }
+
+    @Test
+    public void testFindById_NotExists() {
+        assertThat(userService.findById(Long.MAX_VALUE)).isEmpty();
+    }
+
+    @Test
+    public void testFindByBirthdateBetween() {
+        var start = LocalDate.of(1993, 2, 25); // corner case to test inclusive start
+        var end = LocalDate.of(2004, 11, 26); // corner case to test inclusive end
+        assertThat(userService.findByBirthdateBetween(start, end)).isEmpty();
     }
 
 }
