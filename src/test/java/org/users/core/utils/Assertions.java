@@ -1,4 +1,4 @@
-package org.users.core.testutils;
+package org.users.core.utils;
 
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.function.Executable;

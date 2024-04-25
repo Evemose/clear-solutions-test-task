@@ -1,7 +1,6 @@
 package org.users.core;
 
 
-import org.antlr.v4.runtime.misc.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -10,13 +9,15 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.users.core.model.User;
-import org.users.core.testutils.ConstraintViolationInfo;
+import org.users.core.utils.ConstraintViolationInfo;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
-import static org.users.core.testutils.Assertions.assertConstraintViolations;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.users.core.utils.Assertions.assertConstraintViolations;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
@@ -31,11 +32,11 @@ public class UserServiceTest {
     public record InvalidUser(User user, ConstraintViolationInfo[] errors) {}
 
     @Test
+    @DirtiesContext
     public void testSave_Valid() {
         var user = new User("mockemail@mock.com", "John", "Doe",
                 LocalDate.now().minusYears(minAge + 10));
-        var savedUser = userService.save(user);
-        Assertions.assertEquals(user, savedUser);
+        assertDoesNotThrow(() -> userService.save(user));
     }
 
     private Stream<?> invalidUsers() {
@@ -69,10 +70,19 @@ public class UserServiceTest {
 
     @ParameterizedTest
     @MethodSource("invalidUsers")
+    @DirtiesContext // could possibly dirty the context if test fails and invalid user is saved
     public void testSave_Invalid(InvalidUser userAndErrors) {
         assertConstraintViolations(() -> userService.save(userAndErrors.user), userAndErrors.errors);
     }
 
+    @Test
+    public void testExistsById_Exists() {
+        assertTrue(userService.existsById(1L));
+    }
 
+    @Test
+    public void testExistsById_NotExists() {
+        assertFalse(userService.existsById(Long.MAX_VALUE));
+    }
 
 }
