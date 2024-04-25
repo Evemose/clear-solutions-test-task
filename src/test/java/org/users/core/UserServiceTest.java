@@ -122,7 +122,7 @@ public class UserServiceTest {
     @SuppressWarnings("all") // suppress isEqualTo warning about comparing different optional to user
     public void testFindById_Exists() {
         var actual = new User("joseph26@example.net", "Adam", "Brady", LocalDate.of(1934, 9, 1));
-        actual.setAddress(new Address("Anthony Burgs", "New Brianshire", "Iraq", 97225L));
+        actual.setAddress(new Address(123, "Anthony Burgs", "New Brianshire", "Iraq", 97225));
         actual.setId(1L);
         actual.setPhoneNumber("282-500-3002x343");
         assertThat(userService.findById(1L))
