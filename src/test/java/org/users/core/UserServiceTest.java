@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.users.core.model.entities.Address;
 import org.users.core.model.entities.User;
+import org.users.core.utils.CaseAndException;
+import org.users.core.utils.CaseAndExplanation;
 import org.users.core.utils.ConstraintViolationInfo;
 
 import java.time.LocalDate;
@@ -31,7 +33,8 @@ public class UserServiceTest {
     @Autowired
     UserService userService;
 
-    public record InvalidUser(User user, ConstraintViolationInfo[] errors) {}
+    public record InvalidUser(User user, ConstraintViolationInfo[] errors) {
+    }
 
     @Test
     @DirtiesContext
@@ -78,6 +81,11 @@ public class UserServiceTest {
     }
 
     @Test
+    public void testSave_Null() {
+        assertThrows(NullPointerException.class, () -> userService.save(null));
+    }
+
+    @Test
     public void testExistsById_Exists() {
         assertTrue(userService.existsById(1L));
     }
@@ -85,6 +93,11 @@ public class UserServiceTest {
     @Test
     public void testExistsById_NotExists() {
         assertFalse(userService.existsById(Long.MAX_VALUE));
+    }
+
+    @Test
+    public void testExistsById_Null() {
+        assertThrows(NullPointerException.class, () -> userService.existsById(null));
     }
 
     @Test
@@ -98,6 +111,11 @@ public class UserServiceTest {
     @DirtiesContext // could possibly dirty the context if test fails and valid user is deleted
     public void testDeleteById_NotExists() {
         assertThrows(EntityNotFoundException.class, () -> userService.deleteById(Long.MAX_VALUE));
+    }
+
+    @Test
+    public void testDeleteById_Null() {
+        assertThrows(NullPointerException.class, () -> userService.deleteById(null));
     }
 
     @Test
@@ -120,10 +138,56 @@ public class UserServiceTest {
     }
 
     @Test
+    public void testFindById_Null() {
+        assertThrows(NullPointerException.class, () -> userService.findById(null));
+    }
+
+    @Test
     public void testFindByBirthdateBetween() {
         var start = LocalDate.of(1993, 2, 25); // corner case to test inclusive start
         var end = LocalDate.of(2004, 11, 26); // corner case to test inclusive end
-        assertThat(userService.findByBirthdateBetween(start, end)).isEmpty();
+        assertThat(userService.findByBirthdateBetween(start, end))
+                .map(User::getId)
+                .containsExactly(11L, 17L, 20L, 24L, 25L, 28L, 29L, 38L, 47L);
     }
+
+    public record DateRange(LocalDate start, LocalDate end) {
+    }
+
+    public Stream<CaseAndException<DateRange>> invalidDates() {
+        return Stream.of(
+                new CaseAndException<>(
+                        new CaseAndExplanation<>(
+                                new DateRange(null, LocalDate.now()),
+                                "Null start date is forbidden"),
+                        NullPointerException.class
+                ),
+                new CaseAndException<>(
+                        new CaseAndExplanation<>(
+                                new DateRange(LocalDate.now(), null),
+                                "Null end date is forbidden"),
+                        NullPointerException.class
+                ),
+                new CaseAndException<>(
+                        new CaseAndExplanation<>(
+                                new DateRange(LocalDate.now(), LocalDate.now().minusDays(1)),
+                                "Start date after end date is forbidden"),
+                        IllegalArgumentException.class
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidDates")
+    public void testFindByBirthdateBetween_NullStart(CaseAndException<DateRange> caseAndException) {
+        var exception = caseAndException.exceptionType();
+        var dateRange = caseAndException.caseAndExplanation();
+        assertThrows(
+                exception,
+                () -> userService.findByBirthdateBetween(dateRange.input().start, dateRange.input().end),
+                dateRange.explanation()
+        );
+    }
+
 
 }
