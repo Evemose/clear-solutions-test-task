@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import org.users.core.validation.AdultBirthday;
 import org.users.core.validation.Post;
 
@@ -33,6 +34,10 @@ public record PostUserDTO(
         @NotBlank(groups = Post.class) String lastName,
         @AdultBirthday @NotNull(groups = Post.class) LocalDate birthDate,
         @Valid PostAddressDTO address,
-        @NotBlank(groups = Post.class) String phoneNumber
+        @Pattern(regexp = "[x0-9()-]{4,20}", groups = Post.class) String phoneNumber
+        // as https://en.wikipedia.org/wiki/List_of_mobile_telephone_prefixes_by_country states,
+        // the shortest valid phone number is 4 digits, and the longest is 13. We will allow 4-15 digits
+        // so parentheses and hyphens can be included in DTO
+        // as formatting should not be done on the client side
 ) {
 }
