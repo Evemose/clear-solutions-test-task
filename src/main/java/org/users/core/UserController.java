@@ -1,5 +1,6 @@
 package org.users.core;
 
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
@@ -45,6 +46,11 @@ public class UserController {
     }
 
     @PostMapping
+    @ApiResponse(
+            description = "Saves a user",
+            responseCode = "201",
+            headers = @Header(name = "Location", description = "The location of the saved user")
+    )
     public ResponseEntity<GetUserDTO> save(@RequestBody @Validated(Post.class) PostUserDTO userDTO) {
         var saved = userService.save(userMapper.toEntity(userDTO));
         return ResponseEntity.created(URI.create("/users/%d".formatted(saved.getId())))
