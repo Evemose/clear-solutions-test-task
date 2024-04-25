@@ -66,7 +66,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<GetUserDTO> update(@PathVariable Long id, @RequestBody @Validated(Post.class) PostUserDTO userDTO) {
         if (!userService.existsById(id)) {
-            throw new EntityNotFoundException();
+            throw new EntityNotFoundException("User with id " + id + " not found");
         }
         var user = userMapper.toEntity(userDTO);
         user.setId(id);
