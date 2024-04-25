@@ -31,7 +31,7 @@ public record PostUserDTO(
         @Email @NotNull(groups = Post.class) String email,
         @NotBlank(groups = Post.class) String firstName,
         @NotBlank(groups = Post.class) String lastName,
-        @AdultBirthday LocalDate birthDate,
+        @AdultBirthday @NotNull(groups = Post.class) LocalDate birthDate,
         @Valid PostAddressDTO address,
         @NotBlank(groups = Post.class) String phoneNumber
 ) {
