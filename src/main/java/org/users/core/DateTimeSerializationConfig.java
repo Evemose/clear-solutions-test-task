@@ -1,5 +1,6 @@
 package org.users.core;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -24,6 +25,7 @@ public class DateTimeSerializationConfig {
         timeModule.addSerializer(LocalDate.class, new CustomLocalDateSerializer());
         timeModule.addDeserializer(LocalDate.class, new CustomLocalDateDeserializer());
         objectMapper.registerModule(timeModule);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return objectMapper;
     }
 
