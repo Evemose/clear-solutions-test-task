@@ -2,10 +2,10 @@ package org.users.core.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
+
 
 public class AdultValidator implements ConstraintValidator<AdultBirthday, LocalDate> {
 

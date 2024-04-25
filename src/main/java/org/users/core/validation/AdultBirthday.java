@@ -1,7 +1,6 @@
 package org.users.core.validation;
 
 import jakarta.validation.Constraint;
-import jakarta.validation.constraints.NotNull;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
