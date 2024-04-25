@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "The address of a user",
         example = """
                 {
+                    "houseNumber": 123,
                     "street": "Main St",
                     "city": "Springfield",
                     "country": "USA",
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
                 }
                 """)
 public record GetAddressDTO(
+        Integer houseNumber,
         String street,
         String city,
         String country,
