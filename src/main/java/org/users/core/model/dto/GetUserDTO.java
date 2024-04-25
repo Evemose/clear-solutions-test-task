@@ -1,5 +1,6 @@
 package org.users.core.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
@@ -21,12 +22,12 @@ import java.time.LocalDateTime;
                         "zipCode": "33000"
                     },
                     "phoneNumber": "555-555-5555",
-                    "createdAt": "2021-01-01",
-                    "updatedAt": "2021-01-01"
+                    "createdAt": "2015-10-01 23:00:12",
+                    "updatedAt": "2021-12-15 16:32:45"
                 }
                 """
 )
-        public record GetUserDTO(
+public record GetUserDTO(
         Long id,
         String email,
         String firstName,
@@ -34,6 +35,7 @@ import java.time.LocalDateTime;
         LocalDate birthDate,
         GetAddressDTO address,
         String phoneNumber,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
-){ }
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime createdAt,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime updatedAt
+) {
+}
