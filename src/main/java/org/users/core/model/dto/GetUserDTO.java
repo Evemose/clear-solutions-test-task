@@ -19,7 +19,9 @@ import java.time.LocalDate;
                         "country": "USA",
                         "zipCode": "33000"
                     },
-                    "phoneNumber": "555-555-5555"
+                    "phoneNumber": "555-555-5555",
+                    "createdAt": "2021-01-01",
+                    "updatedAt": "2021-01-01"
                 }
                 """
 )
@@ -30,5 +32,7 @@ import java.time.LocalDate;
         String lastName,
         LocalDate birthDate,
         GetAddressDTO address,
-        String phoneNumber
+        String phoneNumber,
+        LocalDate createdAt,
+        LocalDate updatedAt
 ){ }
