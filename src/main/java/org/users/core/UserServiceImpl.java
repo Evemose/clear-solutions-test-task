@@ -1,9 +1,10 @@
 package org.users.core;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
-import org.users.core.model.User;
+import org.users.core.model.entities.User;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteById(Long id) {
+        if (!existsById(id)) {
+            throw new EntityNotFoundException("User with id " + id + " not found");
+        }
         userRepository.deleteById(id);
     }
 }
