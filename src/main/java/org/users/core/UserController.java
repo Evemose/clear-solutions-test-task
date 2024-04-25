@@ -1,10 +1,8 @@
 package org.users.core;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -71,7 +69,25 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<GetUserDTO> patch(@PathVariable Long id, @RequestBody PostUserDTO userDTO) {
+    public ResponseEntity<GetUserDTO> patch(
+            @PathVariable Long id,
+            @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @io.swagger.v3.oas.annotations.media.Content(
+                            examples = @ExampleObject(
+                                    name = "user",
+                                    summary = "User to update",
+                                    value = """
+                                                {
+                                                    "firstName": "John",
+                                                    "lastName": "Doe",
+                                                    "birthDate": "2000-01-01",
+                                                    "address":
+                                                    {
+                                                        "zip": "62701"
+                                                    }
+                                                }
+                                            """
+                            ))) PostUserDTO userDTO) {
         return ResponseEntity.ok(userMapper.toDto(
                 userService.save(
                         userMapper.toEntity(userDTO, userService.findById(id).orElseThrow(
