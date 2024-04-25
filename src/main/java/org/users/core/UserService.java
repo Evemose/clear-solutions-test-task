@@ -11,6 +11,7 @@ public interface UserService {
 
     /**
      * Saves a user
+     *
      * @param user the user to save
      * @return the saved user
      * @throws NullPointerException if a user is null
@@ -19,6 +20,7 @@ public interface UserService {
 
     /**
      * Checks if a user with the given id exists
+     *
      * @param id the id of the user to check
      * @return true if a user with the given id exists, false otherwise
      * @throws NullPointerException if id is null
@@ -27,14 +29,16 @@ public interface UserService {
 
     /**
      * Deletes a user by id
+     *
      * @param id the id of the user to delete
      * @throws EntityNotFoundException if the user with the given id does not exist
-     * @throws NullPointerException if id is null
+     * @throws NullPointerException    if id is null
      */
     void deleteById(Long id);
 
     /**
      * Finds a user by id
+     *
      * @param id the id of the user to find
      * @return an optional containing the user with the given id, or empty if no such user exists
      * @throws NullPointerException if id is null
@@ -43,11 +47,12 @@ public interface UserService {
 
     /**
      * Finds all users with a birthdate between the given start and end dates (inclusive)
+     *
      * @param start the start date
-     * @param end the end date
+     * @param end   the end date
      * @return a list of users with a birthdate between the given start and end dates
      * @throws IllegalArgumentException if start is after end. More formally, if {@code start.isAfter(end)}
-     * @throws NullPointerException if start or end is null
+     * @throws NullPointerException     if start or end is null
      */
     List<User> findByBirthdateBetween(LocalDate start, LocalDate end);
 }
