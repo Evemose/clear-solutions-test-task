@@ -1,4 +1,4 @@
-package org.users.core.model;
+package org.users.core.model.entities;
 
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
@@ -8,7 +8,6 @@ import lombok.NonNull;
 import lombok.With;
 
 @Embeddable
-@With
 public record Address(
         @NotBlank @NonNull String street,
         @NotBlank @NonNull String city,
