@@ -56,7 +56,7 @@ public class User {
 
     @CreatedDate
     @Column(updatable = false)
-    @NotNull
+    // this field could be null on save as it is ignored on update after creation
     LocalDateTime createdAt;
 
     @LastModifiedDate
