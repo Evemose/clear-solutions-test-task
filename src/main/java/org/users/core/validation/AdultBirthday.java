@@ -17,7 +17,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 public @interface AdultBirthday {
-    String message() default "Must be a date in the past";
+    // there is no way to inject value into annotation, so a message must be formed in the validator
+    String message() default "";
 
     Class<?>[] groups() default {};
 

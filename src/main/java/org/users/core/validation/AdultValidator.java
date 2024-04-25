@@ -19,6 +19,12 @@ public class AdultValidator implements ConstraintValidator<AdultBirthday, LocalD
         // because age increments on the next day after the birthday, not on the birthday itself
         // that's why we use value.isBefore(LocalDate.now().minusYears(adultAge))
         // instead of !LocalDate.now().minusYears(adultAge).isAfter(value)
-        return value == null || value.isBefore(LocalDate.now().minusYears(adultAge));
+        var validationResult = value == null || value.isBefore(LocalDate.now().minusYears(adultAge));
+        if (!validationResult) {
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate("must be at least %d years ago".formatted(adultAge))
+                    .addConstraintViolation();
+        }
+        return validationResult;
     }
 }
