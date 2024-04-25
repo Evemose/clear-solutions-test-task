@@ -1,7 +1,6 @@
 package org.users.core;
 
 
-import jakarta.validation.ConstraintViolationException;
 import org.antlr.v4.runtime.misc.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,13 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.users.core.model.User;
+import org.users.core.testutils.ConstraintViolationInfo;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.users.core.testutils.Assertions.assertConstraintViolations;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
@@ -29,6 +27,8 @@ public class UserServiceTest {
 
     @Autowired
     UserService userService;
+
+    public record InvalidUser(User user, ConstraintViolationInfo[] errors) {}
 
     @Test
     public void testSave_Valid() {
@@ -50,41 +50,27 @@ public class UserServiceTest {
 
 
         return Stream.of(
-                new Pair<>(invalidEmailUser, List.of(
+                new InvalidUser(invalidEmailUser, new ConstraintViolationInfo[]{
                         new ConstraintViolationInfo("email", "must be a well-formed email address")
-                )),
-                new Pair<>(invalidFirstNameUser, List.of(
+                }),
+                new InvalidUser(invalidFirstNameUser, new ConstraintViolationInfo[]{
                         new ConstraintViolationInfo("firstName", "must match \"^[a-zA-Z-]+$\"")
-                )),
-                new Pair<>(invalidLastNameUser, List.of(
+                }),
+                new InvalidUser(invalidLastNameUser, new ConstraintViolationInfo[]{
                         new ConstraintViolationInfo("lastName", "must match \"^[a-zA-Z-]+$\""),
                         new ConstraintViolationInfo("lastName", "must not be blank")
-                )),
-                new Pair<>(invalidBirthDateUser, List.of(
+                }),
+                new InvalidUser(invalidBirthDateUser, new ConstraintViolationInfo[]{
                         new ConstraintViolationInfo("birthDate", "Must be a date in the past")
-                ))
+                })
         );
 
-    }
-
-    public record ConstraintViolationInfo(String field, String message) {
     }
 
     @ParameterizedTest
     @MethodSource("invalidUsers")
-    public void testSave_Invalid(Pair<User, List<ConstraintViolationInfo>> userAndErrors) {
-        var user = userAndErrors.a;
-        var error = userAndErrors.b;
-
-        var thrown = assertThrows(
-                ConstraintViolationException.class,
-                () -> userService.save(user)
-        );
-        var violations = thrown.getConstraintViolations();
-        Assertions.assertEquals(error.size(), violations.size());
-        assertThat(violations.stream().map(v ->
-                new ConstraintViolationInfo(v.getPropertyPath().toString(), v.getMessage()))
-        ).containsExactlyInAnyOrderElementsOf(error);
+    public void testSave_Invalid(InvalidUser userAndErrors) {
+        assertConstraintViolations(() -> userService.save(userAndErrors.user), userAndErrors.errors);
     }
 
 }
