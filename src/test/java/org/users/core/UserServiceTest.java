@@ -1,7 +1,7 @@
 package org.users.core;
 
 
-import org.junit.jupiter.api.Assertions;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.users.core.model.User;
+import org.users.core.model.entities.User;
 import org.users.core.utils.ConstraintViolationInfo;
 
 import java.time.LocalDate;
@@ -83,6 +83,19 @@ public class UserServiceTest {
     @Test
     public void testExistsById_NotExists() {
         assertFalse(userService.existsById(Long.MAX_VALUE));
+    }
+
+    @Test
+    @DirtiesContext
+    public void testDeleteById_Exists() {
+        assertDoesNotThrow(() -> userService.deleteById(1L));
+        assertFalse(userService.existsById(1L));
+    }
+
+    @Test
+    @DirtiesContext // could possibly dirty the context if test fails and valid user is deleted
+    public void testDeleteById_NotExists() {
+        assertThrows(EntityNotFoundException.class, () -> userService.deleteById(Long.MAX_VALUE));
     }
 
 }
