@@ -1,10 +1,7 @@
 package org.users.core.model;
 
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -27,6 +24,7 @@ public class User {
     @Email
     @NonNull
     @NotNull
+    @Column(unique = true)
     String email;
 
     @NotBlank
@@ -47,8 +45,8 @@ public class User {
     @Nullable
     Address address;
 
-    @Pattern(regexp = "^\\+[0-9]{9}$")
     @Nullable
+    @Column(unique = true)
     String phoneNumber;
 
 }

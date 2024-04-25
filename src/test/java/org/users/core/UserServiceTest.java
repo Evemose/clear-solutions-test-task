@@ -73,4 +73,6 @@ public class UserServiceTest {
         assertConstraintViolations(() -> userService.save(userAndErrors.user), userAndErrors.errors);
     }
 
+
+
 }
