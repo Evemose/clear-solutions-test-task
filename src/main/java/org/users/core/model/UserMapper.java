@@ -17,6 +17,6 @@ public abstract class UserMapper {
     public abstract User toEntity(PostUserDTO userDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "address", expression = "java(addressMapper.toEntity(userDto.address()))")
+    @Mapping(target = "address", expression = "java(addressMapper.toEntity(userDto.address(), user.getAddress()))")
     public abstract User toEntity(PostUserDTO userDto, @MappingTarget User user);
 }
