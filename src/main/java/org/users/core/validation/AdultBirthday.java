@@ -12,12 +12,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * The annotated element must be a date in the past.
  * Suitable for {@link java.time.LocalDate}.
- * Null values are considered invalid.
+ * Null values are considered valid.
  */
 @Constraint(validatedBy = AdultValidator.class)
 @Retention(RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
-@NotNull
 public @interface AdultBirthday {
     String message() default "Must be a date in the past";
 

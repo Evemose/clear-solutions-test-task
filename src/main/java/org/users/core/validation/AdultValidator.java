@@ -13,12 +13,12 @@ public class AdultValidator implements ConstraintValidator<AdultBirthday, LocalD
     private int adultAge;
 
     @Override
-    public boolean isValid(@NonNull LocalDate value, ConstraintValidatorContext context) {
+    public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
         // in most jurisdictions, a person is considered an adult at then next day after their birthday,
         // i.e. if the person was born on 2000-01-01, they are considered an adult on 2018-01-02,
         // because age increments on the next day after the birthday, not on the birthday itself
         // that's why we use value.isBefore(LocalDate.now().minusYears(adultAge))
         // instead of !LocalDate.now().minusYears(adultAge).isAfter(value)
-        return value.isBefore(LocalDate.now().minusYears(adultAge));
+        return value == null || value.isBefore(LocalDate.now().minusYears(adultAge));
     }
 }
