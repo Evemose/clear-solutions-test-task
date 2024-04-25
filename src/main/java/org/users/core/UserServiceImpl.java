@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User save(User user) {
         Objects.requireNonNull(user, "user must not be null");
-        return userRepository.save(user);
+        return userRepository.saveAndFlush(user); // flush to return audited entity
     }
 
     @Override
