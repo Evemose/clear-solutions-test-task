@@ -14,7 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Suitable for {@link java.time.LocalDate}.
  * Null values are considered invalid.
  */
-@Constraint(validatedBy = BeforeTodayValidator.class)
+@Constraint(validatedBy = AdultValidator.class)
 @Retention(RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @NotNull

@@ -33,6 +33,8 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.5.5.Final")
     runtimeOnly("org.postgresql:postgresql")
     testRuntimeOnly("com.h2database:h2")
+    testCompileOnly("org.projectlombok:lombok")
+    testAnnotationProcessor("org.projectlombok:lombok")
 }
 
 tasks.withType<Test> {
