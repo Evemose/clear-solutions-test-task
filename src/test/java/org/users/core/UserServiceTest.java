@@ -122,7 +122,7 @@ public class UserServiceTest {
     @SuppressWarnings("all") // suppress isEqualTo warning about comparing different optional to user
     public void testFindById_Exists() {
         var actual = new User("joseph26@example.net", "Adam", "Brady", LocalDate.of(1934, 9, 1));
-        actual.setAddress(new Address(123, "Anthony Burgs", "New Brianshire", "Iraq", 97225));
+        actual.setAddress(new Address(1, "Anthony Burgs", "New Brianshire", "Iraq", "97225"));
         actual.setId(1L);
         actual.setPhoneNumber("282-500-3002x343");
         assertThat(userService.findById(1L))
@@ -148,7 +148,7 @@ public class UserServiceTest {
         var end = LocalDate.of(2004, 11, 26); // corner case to test inclusive end
         assertThat(userService.findByBirthdateBetween(start, end))
                 .map(User::getId)
-                .containsExactly(11L, 17L, 20L, 24L, 25L, 28L, 29L, 38L, 47L);
+                .containsExactly(11L, 17L, 20L, 24L, 25L, 28L, 29L, 38L, 47L, 50L);
     }
 
     public record DateRange(LocalDate start, LocalDate end) {
