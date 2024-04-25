@@ -3,6 +3,7 @@ package org.users.core.model.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Schema(description = "The user to get",
         example = """
@@ -33,6 +34,6 @@ import java.time.LocalDate;
         LocalDate birthDate,
         GetAddressDTO address,
         String phoneNumber,
-        LocalDate createdAt,
-        LocalDate updatedAt
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
 ){ }
