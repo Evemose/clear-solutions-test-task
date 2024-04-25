@@ -55,7 +55,7 @@ public class User {
     String phoneNumber;
 
     @CreatedDate
-    @Column(updatable = false)
+    @Column(updatable = false, nullable = false)
     // this field could be null on save as it is ignored on update after creation
     LocalDateTime createdAt;
 
