@@ -22,7 +22,7 @@ import static org.users.core.testutils.Assertions.assertConstraintViolations;
 @SpringBootTest
 public class UserServiceTest {
 
-    @Value("${users.min-age}")
+    @Value("${adult.age}")
     int minAge;
 
     @Autowired

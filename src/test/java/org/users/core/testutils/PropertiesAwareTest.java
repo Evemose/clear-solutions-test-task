@@ -7,6 +7,10 @@ import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.util.Properties;
 
+/**
+ * Base class for tests that require access to properties,
+ * but do not want to initialize Spring context.
+ */
 @Slf4j
 public abstract class PropertiesAwareTest {
     protected final Properties properties;
@@ -20,6 +24,7 @@ public abstract class PropertiesAwareTest {
         return stream;
     }
 
+    // it`s possible to enable custom profiles support, but for now there is no need
     public PropertiesAwareTest() {
         properties = new Properties();
         try (var main = guardFromNullStream("application.properties");
