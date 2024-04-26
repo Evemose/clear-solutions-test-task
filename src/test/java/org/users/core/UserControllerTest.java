@@ -1,10 +1,10 @@
 package org.users.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,9 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.users.core.model.dto.GetUserDTO;
 import org.users.core.model.dto.PostAddressDTO;
 import org.users.core.model.dto.PostUserDTO;
-import org.users.core.model.entities.Address;
 import org.users.core.model.entities.User;
 import org.users.core.utils.CaseAndExplanation;
 
@@ -23,8 +23,7 @@ import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,25 +32,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserControllerTest {
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
+
+    @Autowired
+    UserService userService;
 
     @Value("${adult.age}")
-    private int adultAge;
+    int adultAge;
 
     // existing user to assert expected results
-    private final User user;
+    User user;
 
-    public UserControllerTest() {
-        var address = new Address(1, "Anthony Burgs", "New Brianshire", "Iraq", "97225");
-        user = new User("joseph26@example.net", "Adam", "Brady", LocalDate.of(1934, 9, 1));
-        user.setAddress(address);
-        user.setPhoneNumber("282-500-3002x343");
-        user.setId(1L);
-
+    @PostConstruct
+    public void init() {
+        user = userService.findById(1L).orElseThrow();
     }
+
 
     public Stream<CaseAndExplanation<PostUserDTO>> invalidUserProvider() {
         return Stream.of(
@@ -101,7 +100,6 @@ public class UserControllerTest {
 
     @Test
     public void testGet_Invalid() throws Exception {
-
         this.mockMvc.perform(get("/users/{id}", 123L)).
                 andExpect(status().isNotFound());
     }
@@ -109,10 +107,9 @@ public class UserControllerTest {
     @Test
     @DirtiesContext
     public void testSave_Valid() throws Exception {
-        var newUser = new User("mock@mock.com", user.getFirstName(), user.getLastName(), user.getBirthDate());
-        newUser.setAddress(user.getAddress());
-        assert user.getPhoneNumber() != null;
-        newUser.setPhoneNumber("282-500-3992x343");
+        var newUser = objectMapper.convertValue(user, PostUserDTO.class)
+                .withEmail("mock@gmail.com")
+                .withPhoneNumber("123-456-7890");
 
         var result = this.mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(newUser))
@@ -120,11 +117,12 @@ public class UserControllerTest {
                 ).andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
-        var user = objectMapper.readValue(result.getResponse().getContentAsString(), User.class);
+        var user = objectMapper.readValue(result.getResponse().getContentAsString(), GetUserDTO.class);
+
         assertThat(user)
                 .usingRecursiveComparison()
-                .ignoringFields("createdAt", "updatedAt", "id")
-                .isEqualTo(newUser);
+                .ignoringFields("updatedAt")
+                .isEqualTo(objectMapper.convertValue(user, GetUserDTO.class));
     }
 
     @ParameterizedTest
@@ -132,6 +130,35 @@ public class UserControllerTest {
     @DirtiesContext
     public void testSave_Invalid(CaseAndExplanation<PostUserDTO> caseAndExplanation) throws Exception {
         this.mockMvc.perform(post("/users")
+                .content(objectMapper.writeValueAsString(caseAndExplanation.input()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        ).andExpectAll(
+                status().isBadRequest(),
+                content().contentType(MediaType.APPLICATION_JSON_VALUE),
+                content().string("[\"" + caseAndExplanation.explanation() + "\"]")
+        );
+    }
+
+    @Test
+    @DirtiesContext
+    public void testPut_Valid() throws Exception {
+        var updatedUser = objectMapper.convertValue(user, PostUserDTO.class)
+                .withFirstName("Jane")
+                .withLastName("Doe")
+                .withEmail("mock@gmail.com")
+                .withPhoneNumber(null);
+
+        this.mockMvc.perform(put("/users/{id}", 1L)
+                        .content(objectMapper.writeValueAsString(updatedUser))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                ).andExpect(status().isNoContent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidUserProvider")
+    @DirtiesContext
+    public void testPut_Invalid(CaseAndExplanation<PostUserDTO> caseAndExplanation) throws Exception {
+        this.mockMvc.perform(put("/users/{id}", 25L)
                 .content(objectMapper.writeValueAsString(caseAndExplanation.input()))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
         ).andExpectAll(
