@@ -40,9 +40,13 @@ public class UserController {
     )
     public ResponseEntity<List<GetUserDTO>> getAll(@RequestParam(defaultValue = "1900-01-01") LocalDate minBirthdate,
                                                    @RequestParam(defaultValue = "9999-12-31") LocalDate maxBirthdate) {
-        return ResponseEntity.ok(
-                userService.findByBirthdateBetween(minBirthdate, maxBirthdate).stream().map(userMapper::toDto).toList()
-        );
+        try {
+            return ResponseEntity.ok(
+                    userService.findByBirthdateBetween(minBirthdate, maxBirthdate).stream().map(userMapper::toDto).toList()
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping

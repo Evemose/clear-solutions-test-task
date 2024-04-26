@@ -20,6 +20,7 @@ import org.users.core.model.entities.User;
 import org.users.core.utils.CaseAndExplanation;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -179,5 +180,32 @@ public class UserControllerTest {
     public void testDelete_Invalid() throws Exception {
         this.mockMvc.perform(delete("/users/{id}", 123L))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testGetAll_NoArgs() throws Exception {
+        var result = this.mockMvc.perform(get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andReturn();
+        var users = objectMapper.readValue(result.getResponse().getContentAsString(), GetUserDTO[].class);
+        assertThat(users).hasSize(50); // number of records in data.sql
+    }
+
+    @Test
+    public void testGetAll_WithFromAndTo() throws Exception {
+        var result = this.mockMvc.perform(get("/users?minBirthdate=1993-02-25&maxBirthdate=2004-11-26"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andReturn();
+        var users = objectMapper.readValue(result.getResponse().getContentAsString(), GetUserDTO[].class);
+        assertThat(Arrays.stream(users).map(GetUserDTO::id))
+                .containsExactly(11L, 17L, 20L, 24L, 25L, 28L, 29L, 38L, 47L, 50L);
+    }
+
+    @Test
+    public void testGetAll_WithFromAndTo_Invalid() throws Exception {
+        this.mockMvc.perform(get("/users?minBirthdate=2004-11-26&maxBirthdate=1993-02-25"))
+                .andExpect(status().isBadRequest());
     }
 }
