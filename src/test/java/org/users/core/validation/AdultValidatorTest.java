@@ -3,13 +3,19 @@ package org.users.core.validation;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
+import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.users.core.utils.CaseAndExplanation;
 import org.users.core.utils.PropertiesAwareTest;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AdultValidatorTest extends PropertiesAwareTest {
@@ -17,6 +23,17 @@ public class AdultValidatorTest extends PropertiesAwareTest {
 	final AdultValidator adultValidator = new AdultValidator();
 
 	int adultAge;
+
+	@Mock
+	ConstraintValidatorContext constraintValidatorContext;
+
+	@Mock
+	ConstraintValidatorContext.ConstraintViolationBuilder constraintViolationBuilder;
+
+	@BeforeEach
+	public void reset() {
+		openMocks(this);
+	}
 
 	@BeforeAll
 	public void setUp() throws Exception {
@@ -29,7 +46,7 @@ public class AdultValidatorTest extends PropertiesAwareTest {
 	@Test
 	public void isValidTest_Valid() {
         assertTrue(adultValidator.isValid(LocalDate.now().minusYears(adultAge).minusDays(1), null));
-		assertTrue(adultValidator.isValid(null, null));
+		assertTrue(adultValidator.isValid(null, null), "null is considered valid");
 	}
 
 	private Stream<CaseAndExplanation<LocalDate>> invalidDates() {
@@ -47,6 +64,11 @@ public class AdultValidatorTest extends PropertiesAwareTest {
 	@ParameterizedTest
 	@MethodSource("invalidDates")
 	public void isValidTest_Invalid(CaseAndExplanation<LocalDate> testCase) {
-		assertFalse(adultValidator.isValid(testCase.input(), null), testCase.explanation());
+		when(constraintValidatorContext.buildConstraintViolationWithTemplate(anyString()))
+				.thenReturn(constraintViolationBuilder);
+		doNothing().when(constraintValidatorContext).disableDefaultConstraintViolation();
+		when(constraintViolationBuilder.addConstraintViolation()).thenReturn(null);
+
+		assertFalse(adultValidator.isValid(testCase.input(), constraintValidatorContext), testCase.explanation());
 	}
 }
