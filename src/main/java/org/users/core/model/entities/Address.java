@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.NonNull;
 import org.hibernate.validator.constraints.Range;
 
+import java.io.Serializable;
+
 @Embeddable
 public record Address(
         @Positive @NotNull @NonNull Integer houseNumber,
@@ -15,5 +17,5 @@ public record Address(
         @NotBlank @NonNull String city,
         @NotBlank @NonNull String country,
         @Pattern(regexp = "\\d{5}") @NotNull @NonNull String zipCode
-) {
+) implements Serializable {
 }
