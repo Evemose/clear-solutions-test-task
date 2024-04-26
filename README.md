@@ -25,3 +25,7 @@ While security is often non-functional requirment that is not directly mentioned
 6. Swagger
 
 For more comfortable demo, you could go to /swagger-ui/index.html. There you could find example schemas and descriptions of response codes, as well as example request results.
+
+7. In our requirments entity field "Birth date" must be before today, while you have it annotated with @AdultBirthday. Why?
+
+Well, I figured that if user could be created only if they are adult, then entity should have this constraint too. THis could avoid data inconcistencies sinse @AdultBirthday is more strict constraint then "before now".
