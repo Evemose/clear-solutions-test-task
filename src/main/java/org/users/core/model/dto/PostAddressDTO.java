@@ -2,6 +2,7 @@ package org.users.core.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
+import lombok.With;
 import org.users.core.validation.Post;
 
 @Schema(description = "The address of a user",
@@ -14,6 +15,7 @@ import org.users.core.validation.Post;
                     "zipCode": "33000"
                 }
                 """)
+@With
 public record PostAddressDTO(
         @NotNull(groups = Post.class) @Min(1) Integer houseNumber,
         @NotBlank(groups = Post.class) String street,

@@ -2,6 +2,7 @@ package org.users.core.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.With;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
                 }
                 """
 )
+@With
 public record GetUserDTO(
         Long id,
         String email,

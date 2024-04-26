@@ -1,6 +1,7 @@
 package org.users.core.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.With;
 
 @Schema(description = "The address of a user",
         example = """
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
                     "zipCode": 33000
                 }
                 """)
+@With
 public record GetAddressDTO(
         Integer houseNumber,
         String street,
