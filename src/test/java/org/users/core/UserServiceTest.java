@@ -67,7 +67,7 @@ public class UserServiceTest {
                         new ConstraintViolationInfo("lastName", "must not be blank")
                 }),
                 new InvalidUser(invalidBirthDateUser, new ConstraintViolationInfo[]{
-                        new ConstraintViolationInfo("birthDate", "Must be a date in the past")
+                        new ConstraintViolationInfo("birthDate", "must be at least 18 years ago")
                 })
         );
 
