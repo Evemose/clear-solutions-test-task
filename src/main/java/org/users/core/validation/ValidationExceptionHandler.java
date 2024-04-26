@@ -3,7 +3,6 @@ package org.users.core.validation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,6 +73,7 @@ public class ValidationExceptionHandler {
 
     /**
      * Extracts the field name from the message of DataIntegrityViolationException
+     *
      * @param message the message of the exception
      * @return the field name if found
      */
@@ -90,6 +90,7 @@ public class ValidationExceptionHandler {
 
     /**
      * Extracts the value from the message of DataIntegrityViolationException
+     *
      * @param message the message of the exception
      * @return the value if found
      */

@@ -1,7 +1,6 @@
 package org.users.core.model;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,12 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(classes = AddressMapperImpl.class)
 public class AddressMapperTest {
 
+    static PostAddressDTO postAddressDTO;
+    static Address address;
     @Autowired
     private AddressMapper addressMapper;
-
-    static PostAddressDTO postAddressDTO;
-
-    static Address address;
 
     @BeforeAll
     public static void setup() {

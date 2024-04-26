@@ -15,15 +15,6 @@ import java.util.Properties;
 public abstract class PropertiesAwareTest {
     protected final Properties properties;
 
-    private InputStream guardFromNullStream(String resourceName) {
-        var stream = getClass().getClassLoader().getResourceAsStream(resourceName);
-        if (stream == null) {
-            log.warn("Resource {} not found", resourceName);
-            return InputStream.nullInputStream();
-        }
-        return stream;
-    }
-
     // it`s possible to enable custom profiles support, but for now there is no need
     public PropertiesAwareTest() {
         properties = new Properties();
@@ -34,5 +25,14 @@ public abstract class PropertiesAwareTest {
         } catch (IOException ex) {
             throw new IllegalStateException("Unable to load properties", ex);
         }
+    }
+
+    private InputStream guardFromNullStream(String resourceName) {
+        var stream = getClass().getClassLoader().getResourceAsStream(resourceName);
+        if (stream == null) {
+            log.warn("Resource {} not found", resourceName);
+            return InputStream.nullInputStream();
+        }
+        return stream;
     }
 }

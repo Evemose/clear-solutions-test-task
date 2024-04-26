@@ -1,6 +1,8 @@
 package org.users.core.model;
 
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 import org.users.core.model.dto.GetAddressDTO;
 import org.users.core.model.dto.PostAddressDTO;
 import org.users.core.model.entities.Address;

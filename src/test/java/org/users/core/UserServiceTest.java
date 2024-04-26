@@ -25,6 +25,7 @@ import static org.users.core.utils.Assertions.assertConstraintViolations;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
+@SuppressWarnings("ConstantConditions")
 public class UserServiceTest {
 
     @Value("${adult.age}")
@@ -32,9 +33,6 @@ public class UserServiceTest {
 
     @Autowired
     UserService userService;
-
-    public record InvalidUser(User user, ConstraintViolationInfo[] errors) {
-    }
 
     @Test
     @DirtiesContext
@@ -151,9 +149,6 @@ public class UserServiceTest {
                 .containsExactly(11L, 17L, 20L, 24L, 25L, 28L, 29L, 38L, 47L, 50L);
     }
 
-    public record DateRange(LocalDate start, LocalDate end) {
-    }
-
     public Stream<CaseAndException<DateRange>> invalidDates() {
         return Stream.of(
                 new CaseAndException<>(
@@ -187,6 +182,12 @@ public class UserServiceTest {
                 () -> userService.findByBirthdateBetween(dateRange.input().start, dateRange.input().end),
                 dateRange.explanation()
         );
+    }
+
+    public record InvalidUser(User user, ConstraintViolationInfo[] errors) {
+    }
+
+    public record DateRange(LocalDate start, LocalDate end) {
     }
 
 
