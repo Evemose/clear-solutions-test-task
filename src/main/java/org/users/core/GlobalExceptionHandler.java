@@ -59,13 +59,4 @@ public class GlobalExceptionHandler {
             return "temporal";
         }
     }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception ex) {
-        // log all other exceptions as errors
-        log.error("An error occurred", ex);
-        // returning manually to not expose in swagger
-        // forbidden status code is used to not expose internal errors
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-    }
 }
