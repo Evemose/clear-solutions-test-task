@@ -6,11 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.NonNull;
+import lombok.With;
 import org.hibernate.validator.constraints.Range;
 
 import java.io.Serializable;
 
 @Embeddable
+@With
 public record Address(
         @Positive @NotNull @NonNull Integer houseNumber,
         @NotBlank @NonNull String street,
