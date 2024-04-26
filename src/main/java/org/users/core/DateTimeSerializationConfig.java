@@ -16,6 +16,10 @@ import java.time.format.DateTimeFormatter;
 
 @Configuration
 public class DateTimeSerializationConfig {
+
+    static final String datePattern = "yyyy-MM-dd";
+    static final String dateTimePattern = "yyyy-MM-dd HH:mm:ss";
+
     @Bean
     public ObjectMapper objectMapper() {
         var objectMapper = new ObjectMapper();
@@ -31,25 +35,25 @@ public class DateTimeSerializationConfig {
 
     private static class CustomLocalDateTimeSerializer extends LocalDateTimeSerializer {
         public CustomLocalDateTimeSerializer() {
-            super(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            super(DateTimeFormatter.ofPattern(dateTimePattern));
         }
     }
 
     private static class CustomLocalDateTimeDeserializer extends LocalDateTimeDeserializer {
         public CustomLocalDateTimeDeserializer() {
-            super(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            super(DateTimeFormatter.ofPattern(dateTimePattern));
         }
     }
 
     private static class CustomLocalDateSerializer extends LocalDateSerializer {
         public CustomLocalDateSerializer() {
-            super(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            super(DateTimeFormatter.ofPattern(datePattern));
         }
     }
 
     private static class CustomLocalDateDeserializer extends LocalDateDeserializer {
         public CustomLocalDateDeserializer() {
-            super(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            super(DateTimeFormatter.ofPattern(datePattern));
         }
     }
 }
