@@ -167,4 +167,17 @@ public class UserControllerTest {
                 content().string("[\"" + caseAndExplanation.explanation() + "\"]")
         );
     }
+
+    @Test
+    @DirtiesContext
+    public void testDelete_Valid() throws Exception {
+        this.mockMvc.perform(delete("/users/{id}", 1L))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testDelete_Invalid() throws Exception {
+        this.mockMvc.perform(delete("/users/{id}", 123L))
+                .andExpect(status().isNotFound());
+    }
 }
