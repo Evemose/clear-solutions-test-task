@@ -12,8 +12,10 @@ public abstract class UserMapper {
     @Setter(onMethod_ = @Autowired)
     protected AddressMapper addressMapper;
 
+    @Mapping(target = "address", expression = "java(addressMapper.toDTO(user.getAddress()))")
     public abstract GetUserDTO toDto(User user);
 
+    @Mapping(target = "address", expression = "java(addressMapper.toEntity(userDto.address()))")
     public abstract User toEntity(PostUserDTO userDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
