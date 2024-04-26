@@ -170,6 +170,14 @@ public class UserControllerTest {
         );
     }
 
+    @Test
+    public void testPut_NotFound() throws Exception {
+        mockMvc.perform(put("/users/{id}", 123L)
+                .content(objectMapper.writeValueAsString(objectMapper.convertValue(user, PostUserDTO.class)))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        ).andExpect(status().isNotFound());
+    }
+
 
     @Test
     @DirtiesContext
@@ -260,6 +268,14 @@ public class UserControllerTest {
                 content().contentType(MediaType.APPLICATION_JSON_VALUE),
                 content().string("[\"email: must be a well-formed email address\"]")
         );
+    }
+
+    @Test
+    public void testPatch_NotFound() throws Exception {
+        mockMvc.perform(patch("/users/{id}", 123L)
+                .content("{}")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        ).andExpect(status().isNotFound());
     }
 
 }
