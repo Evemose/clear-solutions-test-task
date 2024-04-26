@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.users.core.model.dto.GetAddressDTO;
 import org.users.core.model.dto.GetUserDTO;
 import org.users.core.model.dto.PostAddressDTO;
 import org.users.core.model.dto.PostUserDTO;
@@ -150,9 +151,9 @@ public class UserControllerTest {
                 .withPhoneNumber(null);
 
         this.mockMvc.perform(put("/users/{id}", 1L)
-                        .content(objectMapper.writeValueAsString(updatedUser))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                ).andExpect(status().isNoContent());
+                .content(objectMapper.writeValueAsString(updatedUser))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        ).andExpect(status().isNoContent());
     }
 
     @ParameterizedTest
@@ -168,6 +169,7 @@ public class UserControllerTest {
                 content().string("[\"" + caseAndExplanation.explanation() + "\"]")
         );
     }
+
 
     @Test
     @DirtiesContext
@@ -208,4 +210,56 @@ public class UserControllerTest {
         this.mockMvc.perform(get("/users?minBirthdate=2004-11-26&maxBirthdate=1993-02-25"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DirtiesContext
+    public void testPatch_Valid() throws Exception {
+        var request = """
+                {
+                    "email": "newemail@gmail.com",
+                    "address": {
+                        "zipCode": "12435"
+                    }
+                }
+                """;
+        var result = this.mockMvc.perform(patch("/users/{id}", 1L)
+                .content(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        ).andExpectAll(
+                status().isOk(),
+                content().contentType(MediaType.APPLICATION_JSON_VALUE)
+        ).andReturn();
+        var user = objectMapper.readValue(result.getResponse().getContentAsString(), GetUserDTO.class);
+        assertThat(user)
+                .usingRecursiveComparison()
+                .ignoringFields("updatedAt")
+                .isEqualTo(objectMapper.convertValue(user, GetUserDTO.class)
+                        .withEmail("newemail@gmail.com")
+                        .withAddress(objectMapper.convertValue(user.address(), GetAddressDTO.class)
+                                .withZipCode("12435")
+                        )
+                );
+    }
+
+    @Test
+    @DirtiesContext
+    public void testPatch_Invalid() throws Exception {
+        var request = """
+                {
+                    "email": "invalid",
+                    "address": {
+                        "zipCode": "12435"
+                    }
+                }
+                """;
+        this.mockMvc.perform(patch("/users/{id}", 1L)
+                .content(request)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        ).andExpectAll(
+                status().isBadRequest(),
+                content().contentType(MediaType.APPLICATION_JSON_VALUE),
+                content().string("[\"email: must be a well-formed email address\"]")
+        );
+    }
+
 }
