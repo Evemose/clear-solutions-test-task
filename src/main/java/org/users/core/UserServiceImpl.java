@@ -1,13 +1,13 @@
 package org.users.core;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.users.core.model.entities.User;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -16,20 +16,17 @@ public class UserServiceImpl implements UserService {
     final UserRepository userRepository;
 
     @Override
-    public User save(User user) {
-        Objects.requireNonNull(user, "user must not be null");
+    public User save(@NonNull User user) {
         return userRepository.saveAndFlush(user); // flush to return audited entity
     }
 
     @Override
-    public boolean existsById(Long id) {
-        Objects.requireNonNull(id, "id must not be null");
+    public boolean existsById(@NonNull Long id) {
         return userRepository.existsById(id);
     }
 
     @Override
-    public void deleteById(Long id) {
-        Objects.requireNonNull(id, "id must not be null");
+    public void deleteById(@NonNull Long id) {
         if (!existsById(id)) {
             throw new EntityNotFoundException("User with id " + id + " not found");
         }
@@ -37,15 +34,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findById(Long id) {
-        Objects.requireNonNull(id, "id must not be null");
+    public Optional<User> findById(@NonNull Long id) {
         return userRepository.findById(id);
     }
 
     @Override
-    public List<User> findByBirthdateBetween(LocalDate start, LocalDate end) {
-        Objects.requireNonNull(start, "start date must not be null");
-        Objects.requireNonNull(end, "end date must not be null");
+    public List<User> findByBirthdateBetween(@NonNull LocalDate start, @NonNull LocalDate end) {
         if (start.isAfter(end)) {
             throw new IllegalArgumentException("start date must be before end date");
         }

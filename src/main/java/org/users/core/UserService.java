@@ -1,6 +1,7 @@
 package org.users.core;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import org.users.core.model.entities.User;
 
 import java.time.LocalDate;
@@ -16,7 +17,7 @@ public interface UserService {
      * @return the saved user
      * @throws NullPointerException if a user is null
      */
-    User save(User user);
+    User save(@NonNull User user);
 
     /**
      * Checks if a user with the given id exists
@@ -25,7 +26,7 @@ public interface UserService {
      * @return true if a user with the given id exists, false otherwise
      * @throws NullPointerException if id is null
      */
-    boolean existsById(Long id);
+    boolean existsById(@NonNull Long id);
 
     /**
      * Deletes a user by id
@@ -34,7 +35,7 @@ public interface UserService {
      * @throws EntityNotFoundException if the user with the given id does not exist
      * @throws NullPointerException    if id is null
      */
-    void deleteById(Long id);
+    void deleteById(@NonNull Long id);
 
     /**
      * Finds a user by id
@@ -43,7 +44,7 @@ public interface UserService {
      * @return an optional containing the user with the given id, or empty if no such user exists
      * @throws NullPointerException if id is null
      */
-    Optional<User> findById(Long id);
+    Optional<User> findById(@NonNull Long id);
 
     /**
      * Finds all users with a birthdate between the given start and end dates (inclusive)
@@ -54,5 +55,5 @@ public interface UserService {
      * @throws IllegalArgumentException if start is after end. More formally, if {@code start.isAfter(end)}
      * @throws NullPointerException     if start or end is null
      */
-    List<User> findByBirthdateBetween(LocalDate start, LocalDate end);
+    List<User> findByBirthdateBetween(@NonNull LocalDate start, @NonNull LocalDate end);
 }
