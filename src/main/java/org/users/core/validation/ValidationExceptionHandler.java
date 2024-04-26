@@ -17,8 +17,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@RestControllerAdvice
-@ComponentScan("org.users.core") // base package for component scan
+@RestControllerAdvice(basePackages = "org.users.core")
 @Slf4j
 public class ValidationExceptionHandler {
 
