@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.With;
 import org.users.core.validation.AdultBirthday;
 import org.users.core.validation.Post;
 
@@ -28,6 +29,7 @@ import java.time.LocalDate;
                     "phoneNumber": "555-555-5555"
                 }
                 """)
+@With
 public record PostUserDTO(
         @Email @NotNull(groups = Post.class) String email,
         @NotBlank(groups = Post.class) String firstName,
