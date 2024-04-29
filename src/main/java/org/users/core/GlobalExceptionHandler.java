@@ -26,19 +26,19 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ResponseEntity<String> handleInvalidFormat(HttpMessageNotReadableException ex) {
         // invalid format is a common exception, so log as warning
         log.warn(ex.getMessage());
         if (ex.getCause() instanceof InvalidFormatException formatEx) {
             if (formatEx.getCause() instanceof DateTimeParseException) {
-                return ResponseEntity.badRequest().body("Invalid format for %s: %s".formatted(
+                return ResponseEntity.unprocessableEntity().body("Invalid format for %s: %s".formatted(
                         getTemporalTypeName(formatEx.getTargetType()),
                         formatEx.getValue()
                 ));
             }
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.unprocessableEntity().build();
     }
 
     // better not to expose the actual type in the error message

@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public class AdultValidator implements ConstraintValidator<AdultBirthday, LocalDate> {
 
     @Value("${adult.age}")
-    private int adultAge;
+    int adultAge;
 
     @Override
     public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
