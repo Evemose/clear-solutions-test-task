@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -50,17 +51,26 @@ public class ValidationExceptionHandler {
                 .toArray(String[]::new));
     }
 
+    // this handler is configured to work with English_USA.utf8 locale
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String[]> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+    public ResponseEntity<String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         if (ex.getCause() instanceof org.hibernate.exception.ConstraintViolationException constraintEx) {
             // data integrity violation is a common exception, so log as warning
             log.warn(ex.getMessage());
             if (constraintEx.getMessage().contains("Unique index or primary key")) {
-                var fieldName = extractFieldName(constraintEx.getMessage());
+                var fieldName = extractFieldNameFromIndexViolation(constraintEx.getMessage());
                 return fieldName.map(s -> ResponseEntity.badRequest().body(
-                        new String[]{s + " must be unique, but a duplicate was found"
-                                + extractValue(constraintEx.getSQLException().getMessage()).map(v -> ": " + v).orElse("")}
+                        s + " must be unique, but a duplicate was found"
+                                + extractValueFromIndexViolation(constraintEx.getSQLException().getMessage()).map(v -> ": " + v).orElse("")
+                )).orElseGet(() -> ResponseEntity.badRequest().build());
+            } else if (constraintEx.getMessage().contains("violates foreign key constraint")) {
+                return ResponseEntity.badRequest().body("Data integrity violation: invalid reference");
+            } else if (constraintEx.getMessage().contains("value violates unique constraint")) {
+                var fieldName = extractFieldNameFromUniqueViolation(constraintEx.getMessage());
+                return fieldName.map(s -> ResponseEntity.badRequest().body(
+                        s + " must be unique, but a duplicate was found"
+                                + extractValueFromUniqueViolation(constraintEx.getMessage()).map(v -> ": " + v).orElse("")
                 )).orElseGet(() -> ResponseEntity.badRequest().build());
             }
         }
@@ -71,21 +81,40 @@ public class ValidationExceptionHandler {
         return ResponseEntity.badRequest().build();
     }
 
+    private Optional<String > extractValueFromUniqueViolation(String message) {
+        var outerGroupMatcher = Pattern.compile("Detail: Key \\(\\S+\\)=\\(\\S*\\)").matcher(message);
+        if (outerGroupMatcher.find()) {
+            return Optional.of(outerGroupMatcher.group().split("\\(")[2].split("\\)")[0].strip());
+        }
+        return Optional.empty();
+    }
+
+    private Optional<String> extractFieldNameFromUniqueViolation(String message) {
+        var outerGroupMatcher = Pattern.compile("Detail: Key \\(\\S+\\)").matcher(message);
+        return extractNameFromMatcher(outerGroupMatcher, "\\)");
+    }
+
+
+    private Optional<String> extractNameFromMatcher(Matcher outerGroupMatcher, String rightDelimiter) {
+        if (outerGroupMatcher.find()) {
+            var snakeCase = outerGroupMatcher.group().split("\\(")[1].split(rightDelimiter)[0].strip().toLowerCase();
+            var pascalCase = Optional.of(Arrays.stream(snakeCase.split("_"))
+                    .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1))
+                    .collect(Collectors.joining()));
+            return pascalCase.map(s -> s.substring(0, 1).toLowerCase() + s.substring(1)); // convert to camelCase
+        }
+        return Optional.empty();
+    }
+
     /**
      * Extracts the field name from the message of DataIntegrityViolationException
      *
      * @param message the message of the exception
      * @return the field name if found
      */
-    private Optional<String> extractFieldName(String message) {
-        var outerGroupMatcher = Pattern.compile("ON PUBLIC\\.\\w+\\([\\w\\s]+\\)").matcher(message);
-        if (outerGroupMatcher.find()) {
-            var snakeCase = outerGroupMatcher.group().split("\\(")[1].split("\\s")[0].strip().toLowerCase();
-            return Optional.of(Arrays.stream(snakeCase.split("_"))
-                    .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1))
-                    .collect(Collectors.joining()));
-        }
-        return Optional.empty();
+    private Optional<String> extractFieldNameFromIndexViolation(String message) {
+        var outerGroupMatcher = Pattern.compile("ON PUBLIC\\.\\S+\\([\\w\\s]+\\)").matcher(message);
+        return extractNameFromMatcher(outerGroupMatcher, "\\s");
     }
 
     /**
@@ -94,7 +123,7 @@ public class ValidationExceptionHandler {
      * @param message the message of the exception
      * @return the value if found
      */
-    private Optional<String> extractValue(String message) {
+    private Optional<String> extractValueFromIndexViolation(String message) {
         var outerGroupMatcher = Pattern.compile("\\sVALUES\\s*\\(\\s*/\\*\\s*\\d+\\s*\\*/.+\\)").matcher(message);
         if (outerGroupMatcher.find()) {
             return Optional.of(outerGroupMatcher.group().split("\\*/")[1].split("\\)")[0].strip());
